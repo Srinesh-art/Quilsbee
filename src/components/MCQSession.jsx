@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+﻿import React, { useState } from "react"
 import { Check, ChevronRight, LoaderCircle, RotateCcw, SkipForward, Sparkles, X } from "lucide-react"
 
 const API = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "")
@@ -102,7 +102,7 @@ export default function MCQSession({ lesson, level, onEarn }) {
               )
             })}
           </div>
-          {message && <div className={"mcq-feedback " + (status === "correct" ? "good" : "bad")}><b>{status === "correct" ? "Correct · +25 XP" : "Not quite"}</b><p>{message}</p></div>}
+          {message && <div className={"mcq-feedback " + (status === "correct" ? "good" : "bad")}><b>{status === "correct" ? "Correct Â· +25 XP" : "Not quite"}</b><p>{message}</p></div>}
           {status !== "ready" && (
             <div className="mcq-actions">
               <button className="secondary small" onClick={generate}><RotateCcw size={14}/> New question</button>
@@ -129,3 +129,4 @@ export default function MCQSession({ lesson, level, onEarn }) {
     </div>
   )
 }
+

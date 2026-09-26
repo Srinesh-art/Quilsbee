@@ -23,6 +23,16 @@ app.add_middleware(
 )
 
 @app.middleware("http")
+async def vercel_api_prefix(request: Request, call_next):
+    # Vercel serves this FastAPI app under /api; keep the existing route paths unchanged.
+    path = request.scope.get("path", "")
+    if path == "/api":
+        request.scope["path"] = "/"
+    elif path.startswith("/api/"):
+        request.scope["path"] = path[4:]
+    return await call_next(request)
+
+@app.middleware("http")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"

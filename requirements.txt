@@ -1,0 +1,10 @@
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+qiskit>=1.0.0
+qiskit-aer>=0.14.0
+google-genai>=1.0.0
+python-dotenv>=1.0.0
+pennylane>=0.45.1
+cirq>=1.7.0
+qbraid>=0.12.2

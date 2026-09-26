@@ -1,7 +1,7 @@
 ﻿import React, { useMemo, useState } from 'react'
 import { BrainCircuit, Code2, GripVertical, Play, RotateCcw, Sparkles } from 'lucide-react'
 
-const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+const API = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 
 const GATES = [
   { id: 'H', name: 'H', label: 'Superposition' },
@@ -133,6 +133,7 @@ export default function QuantumStudio({ onComplete }) {
     {quiz && <div className="studio-assessment"><div><div className="eyebrow">CHECK YOUR UNDERSTANDING</div><h4>Explain the mission in one phrase.</h4><p>{quiz.question}</p></div><div className="assessment-row"><input value={quizAnswer} onChange={e => setQuizAnswer(e.target.value)} placeholder="e.g. entanglement"/><button className="secondary" onClick={() => setQuizResult(quizAnswer.trim().toLowerCase().includes(quiz.answer) ? 'Correct — you connected the concept to the circuit.' : 'Not quite. Run the circuit, inspect the result, then try again.')}>Check</button></div>{quizResult && <div className={quizResult.startsWith('Correct') ? 'assessment-good' : 'assessment-hint'}>{quizResult}</div>}</div>}
   </div>
 }
+
 
 
 

@@ -16,7 +16,7 @@ import AuthModal from './components/AuthModal';
 import { useAuth } from './auth/AuthContext';
 import { supabase } from './lib/supabase';
 
-const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 const BASE = import.meta.env.BASE_URL || '/';
 const asset = path => `${BASE}${path.replace(/^\//, '')}`;
 const starterBug={title:'The Broken Hadamard',difficulty:'Easy',code:'from qiskit import QuantumCircuit\nqc = QuantumCircuit(1)\nqc.x(0)\nqc.measure_all()',hint:'Create a 50/50 superposition before measurement.'};
