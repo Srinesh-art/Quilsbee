@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  
+  body {
+    background-color: #050505;
+    color: #EAE6DF;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, .font-editorial {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050505;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #222222;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #444444;
+  }
+}
+
+/* Cinematic Vignette */
+.vignette-overlay {
+  background: radial-gradient(circle at center, transparent 35%, rgba(5, 5, 5, 0.9) 100%);
+}
+
+.subtle-glow {
+  box-shadow: 0 0 40px -10px rgba(234, 230, 223, 0.08);
+}
+
+.quantum-border {
+  border: 1px solid rgba(234, 230, 223, 0.12);
+}
+
+.quantum-border-hover:hover {
+  border-color: rgba(234, 230, 223, 0.35);
+  box-shadow: 0 0 30px -5px rgba(234, 230, 223, 0.12);
+}
+
+.glass-panel {
+  background: rgba(10, 10, 10, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(234, 230, 223, 0.1);
+}
+
+.glass-panel-deep {
+  background: rgba(5, 5, 5, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(234, 230, 223, 0.14);
+}
+
+.micro-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-family: 'Inter', sans-serif;
+  color: #8A8780;
+}
