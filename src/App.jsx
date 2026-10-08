@@ -8,7 +8,6 @@ import QuantumStudio from './components/QuantumStudio';
 import AlgorithmDemo from './components/AlgorithmDemo';
 import EntanglementDemo from './components/EntanglementDemo';
 import FinalChallenge from './components/FinalChallenge';
-import InstructorDashboard from './components/InstructorDashboard';
 import AlgorithmGallery from './components/AlgorithmGallery';
 import LearningAdvisor from './components/LearningAdvisor';
 import CurriculumPath from './components/CurriculumPath';
@@ -164,7 +163,804 @@ function LoginScreen(){
   </div>
 }
 
-export default function App(){const {user,profile,loading}=useAuth();const [xp,setXp]=useState(()=>Number(localStorage.getItem('quantum_xp')||420)),[level,setLevel]=useState(()=>Number(localStorage.getItem('quantum_level')||2)),[unlocked,setUnlocked]=useState(()=>Number(localStorage.getItem('quantum_unlocked')||2)),[menu,setMenu]=useState('home'),[qopen,setQopen]=useState(false),[authOpen,setAuthOpen]=useState(false),[bug,setBug]=useState(starterBug);useEffect(()=>{if(!localStorage.getItem('quantum_learner_id'))localStorage.setItem('quantum_learner_id',crypto.randomUUID?.()||('learner-'+Date.now()));},[]);useEffect(()=>{if(profile){setXp(profile.xp??420);setLevel(profile.level??2);localStorage.setItem('quantum_xp',String(profile.xp??420));localStorage.setItem('quantum_level',String(profile.level??2));}},[profile]);if(loading)return <div className="quantum-login quantum-login-loading"><div className="login-loader"><span></span><b>INITIALIZING QUANTUM ACCESS</b><small>Synchronizing your learning space…</small></div></div>;if(!user)return <LoginScreen/>;const earn=n=>{setXp(x=>{const y=x+n;const nextLevel=2+Math.floor(y/500);localStorage.setItem('quantum_xp',String(y));if(nextLevel!==level){setLevel(nextLevel);localStorage.setItem('quantum_level',String(nextLevel));}if(user){supabase.from('profiles').update({xp:y,level:nextLevel,updated_at:new Date().toISOString()}).eq('id',user.id).then(({error})=>{if(error)console.warn('Could not save learner progress',error.message)});}return y});setUnlocked(x=>{const next=Math.min(8,x+1);localStorage.setItem('quantum_unlocked',String(next));return next})};const lesson=menu==='debug'?'Debug the Quantum Circuit':menu==='story'?'AI Story Mode':menu==='studio'?'Quantum Circuit Studio':'Quilsbee';return <div className="platform"><header className="topbar"><div className="brand"><div className="brand-mark">Q</div><div><b>QUILSBEE</b><small>LEARNING PLATFORM</small></div></div><nav aria-label="Primary navigation">{[['home','Learn'],['studio','Quantum Studio'],['debug','Bug Arena'],['story','Story Mode']].map(x=><button className={menu===x[0]?'active':''} onClick={()=>{setMenu(x[0]);document.getElementById(x[0]==='home'?'learn':x[0])?.scrollIntoView({behavior:'smooth'})}} key={x[0]}>{x[1]}</button>)}</nav><div className="top-actions"><div className="streak"><Flame size={15}/> 7 day streak</div><div className="level-pill"><Trophy size={14}/> LVL {level}</div><button className="avatar" onClick={()=>setAuthOpen(true)} aria-label={user?'Open account':'Sign in'} title={user?'Account':'Sign in'}>{user?(profile?.display_name?.[0]||user.email?.[0]||'Q').toUpperCase():<User size={17}/>}</button></div></header><a className="skip-link" href="#learn">Skip to content</a><main id="main-content"><VideoHero/><section className="dashboard" id="learn"><div className="dashboard-head"><div><div className="eyebrow">YOUR LEARNING OS</div><h2>Your quantum learning path.</h2><p>Follow the concept, test the idea, then demonstrate that you can use it.</p></div><XPBar xp={xp} level={level}/></div><div className="stats"><div><span>MASTERED</span><b>6</b><small>core concepts</small></div><div><span>NEXT MILESTONE</span><b>{500-(xp%500)}</b><small>XP remaining</small></div><div><span>BUILD</span><b>{unlocked}/8</b><small>components unlocked</small></div><div><span>DEBUG REVIEW</span><b>LIVE</b><small>learning loop</small></div></div></section><section className="content-section"><div className="section-title"><span>01</span><div><div className="eyebrow">LEARNING PATH</div><h2>Learn the system, then test it.</h2></div></div><LearningAdvisor level={level} xp={xp} unlocked={unlocked}/><CurriculumPath xp={xp} level={level} onEarn={earn}/></section><section className="content-section" id="quantum"><div className="manga-subsection"><div className="section-title compact"><span>01A</span><div><div className="eyebrow">QUANTUM MANGA</div><h2>Read the concept as a story.</h2></div></div><MangaViewer/></div></section><section className="content-section split" id="qubit"><Experiment earn={earn}/><div className="concept-panel"><div className="eyebrow">CONCEPT SNAPSHOT</div><h3>Superposition, made visible.</h3><p>See how a qubit combines basis states, how gates change its state, and how measurement produces an outcome.</p><div className="formula">|ψ⟩ = α|0⟩ + β|1⟩</div><button className="secondary" onClick={()=>earn(40)}><Lightbulb size={15}/> I get it</button></div></section><section className="content-section bloch-section"><div className="section-title"><span>01B</span><div><div className="eyebrow">3D QUBIT LAB</div><h2>See a qubit state in 3D.</h2></div></div><p className="section-lead">Rotate the Bloch sphere, move the state vector, and apply Hadamard to see a qubit leave |0⟩ and enter superposition.</p><Qubit3D onComplete={()=>earn(35)}/></section><section className="content-section" id="studio"><div className="section-title"><span>02</span><div><div className="eyebrow">QUANTUM STUDIO</div><h2>Construct the circuit. Run the idea.</h2></div></div><p className="section-lead">Design circuits visually, inspect the state, generate executable code, compare simulator results, and verify your reasoning with a focused assessment.</p><QuantumStudio onComplete={()=>earn(60)}/></section><section className="content-section" id="algorithms"><div className="section-title"><span>02A</span><div><div className="eyebrow">ALGORITHM LAB</div><h2>Understand the method behind the circuit.</h2></div></div><p className="section-lead">Trace search, oracle methods, teleportation, Fourier methods and hybrid optimization from the underlying idea to a runnable circuit.</p><AlgorithmGallery/><AlgorithmDemo onComplete={()=>earn(70)}/></section><section className="content-section" id="entanglement"><div className="section-title"><span>02B</span><div><div className="eyebrow">ENTANGLEMENT LAB</div><h2>Measure correlation, not just theory.</h2></div></div><EntanglementDemo onComplete={()=>earn(70)}/></section><section className="content-section" id="instructor"><div className="section-title"><span>05</span><div><div className="eyebrow">INSTRUCTOR DASHBOARD</div><h2>Learning progress, at a glance.</h2></div></div><InstructorDashboard/></section><section className="content-section" id="assessment"><div className="section-title"><span>04</span><div><div className="eyebrow">ASSESSMENT</div><h2>Build the circuit under constraint.</h2></div></div><p className="section-lead">A final challenge checks whether your gate sequence produces the requested Bell state and whether you understand why it works.</p><FinalChallenge onPassChallenge={()=>earn(250)}/></section><section className="content-section" id="debug"><div className="section-title"><span>02</span><div><div className="eyebrow">BUG ARENA</div><h2>Debug the circuit. Explain the failure.</h2></div></div><p className="section-lead">Find a meaningful circuit error, verify the correction, then create a harder one for the next learner. Syntax-only mistakes do not count.</p><Debugger earn={earn} lesson={lesson} level={level} onBug={setBug}/></section><section className="content-section" id="story"><div className="section-title"><span>03</span><div><div className="eyebrow">STORY MODE</div><h2>Put a quantum idea in context.</h2></div></div><p className="section-lead">Choose a familiar world, character, sport, game or story and use it to build a concrete mental model for the concept.</p><StoryMode earn={earn} level={level}/></section><section className="content-section"><div className="puzzle-card"><div><div className="eyebrow">MASTERY COLLECTION</div><h3>Build your quantum car</h3><p>Complete meaningful learning actions to unlock the next component.</p><div className="piece-list">{pieces.map((p,i)=><div className={i<unlocked?'piece unlocked':'piece'} key={p}>{i<unlocked?<PuzzleIcon size={16}/>:<Lock size={14}/>}<span>{p}</span></div>)}</div></div><div className="rover quantum-car" aria-label="Quantum car assembly visualization"><div className="rover-shadow"/><div className="rover-body"><div className="car-hood"/><div className="car-cabin"><div className="car-windshield"/><div className="car-window-side"/></div><div className="car-door-line"/><div className="car-handle"/><div className="car-mirror"/><div className="car-front-grille"/><div className="rover-light car-headlight"/><div className="car-taillight"/></div><div className="rover-wheel w1"><div className="wheel-rim"/><div className="wheel-hub"/></div><div className="rover-wheel w2"><div className="wheel-rim"/><div className="wheel-hub"/></div></div></div></section><section className="content-section game-mode-section" id="game-mode"><div className="game-mode-card"><div className="game-mode-icon"><Gamepad2 size={24}/></div><div className="game-mode-copy"><div className="eyebrow">GAME MODE · FUTURE RELEASE</div><h2>Turn quantum learning into play.</h2><p>A dedicated game mode is planned for a future release, with interactive challenges that let you explore quantum ideas through missions, puzzles and progression.</p><div className="game-mode-status"><span className="game-mode-dot"/> IN DEVELOPMENT <span>·</span> COMING IN A FUTURE RELEASE</div></div><div className="game-mode-mark">SOON</div></div></section></main><QBot open={qopen} setOpen={setQopen} lesson={lesson} level={level} code={bug.code} bug={JSON.stringify(bug)}/><footer aria-label="Site footer"><div><b>QUILSBEE</b><span>Learn the strange. Build the impossible.</span></div><div>© 2026 · Built for curious minds</div></footer><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)}/></div>}
+export default function App() {
+  const { user, profile, loading } = useAuth();
+
+  const [xp, setXp] = useState(() =>
+    Number(localStorage.getItem('quantum_xp') || 420)
+  );
+
+  const [level, setLevel] = useState(() =>
+    Number(localStorage.getItem('quantum_level') || 2)
+  );
+
+  const [unlocked, setUnlocked] = useState(() =>
+    Number(localStorage.getItem('quantum_unlocked') || 2)
+  );
+
+  const [menu, setMenu] = useState('home');
+  const [qopen, setQopen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [bug, setBug] = useState(starterBug);
+
+  useEffect(() => {
+    if (!localStorage.getItem('quantum_learner_id')) {
+      localStorage.setItem(
+        'quantum_learner_id',
+        crypto.randomUUID?.() || `learner-${Date.now()}`
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (profile) {
+      setXp(profile.xp ?? 420);
+      setLevel(profile.level ?? 2);
+
+      localStorage.setItem(
+        'quantum_xp',
+        String(profile.xp ?? 420)
+      );
+
+      localStorage.setItem(
+        'quantum_level',
+        String(profile.level ?? 2)
+      );
+    }
+  }, [profile]);
+
+  if (loading) {
+    return (
+      <div className="quantum-login quantum-login-loading">
+        <div className="login-loader">
+          <span></span>
+          <b>INITIALIZING QUANTUM ACCESS</b>
+          <small>Synchronizing your learning space…</small>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginScreen />;
+  }
+
+  const earn = (n) => {
+    setXp((x) => {
+      const y = x + n;
+      const nextLevel = 2 + Math.floor(y / 500);
+
+      localStorage.setItem('quantum_xp', String(y));
+
+      if (nextLevel !== level) {
+        setLevel(nextLevel);
+        localStorage.setItem(
+          'quantum_level',
+          String(nextLevel)
+        );
+      }
+
+      if (user) {
+        supabase
+          .from('profiles')
+          .update({
+            xp: y,
+            level: nextLevel,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id)
+          .then(({ error }) => {
+            if (error) {
+              console.warn(
+                'Could not save learner progress',
+                error.message
+              );
+            }
+          });
+      }
+
+      return y;
+    });
+
+    setUnlocked((x) => {
+      const next = Math.min(8, x + 1);
+
+      localStorage.setItem(
+        'quantum_unlocked',
+        String(next)
+      );
+
+      return next;
+    });
+  };
+
+  const lesson =
+    menu === 'debug'
+      ? 'Debug the Quantum Circuit'
+      : menu === 'story'
+        ? 'AI Story Mode'
+        : menu === 'studio'
+          ? 'Quantum Circuit Studio'
+          : 'Quilsbee';
+
+  return (
+    <div className="platform">
+
+      {/* =========================
+          TOP NAVIGATION
+      ========================== */}
+
+      <header className="topbar">
+        <div className="brand">
+          <div className="brand-mark">Q</div>
+
+          <div>
+            <b>QUILSBEE</b>
+            <small>LEARNING PLATFORM</small>
+          </div>
+        </div>
+
+        <nav aria-label="Primary navigation">
+          {[
+            ['home', 'Learn'],
+            ['studio', 'Quantum Studio'],
+            ['debug', 'Bug Arena'],
+            ['story', 'Story Mode'],
+          ].map((x) => (
+            <button
+              className={menu === x[0] ? 'active' : ''}
+              onClick={() => {
+                setMenu(x[0]);
+
+                document
+                  .getElementById(
+                    x[0] === 'home' ? 'learn' : x[0]
+                  )
+                  ?.scrollIntoView({
+                    behavior: 'smooth',
+                  });
+              }}
+              key={x[0]}
+            >
+              {x[1]}
+            </button>
+          ))}
+        </nav>
+
+        <div className="top-actions">
+          <div className="streak">
+            <Flame size={15} />
+            7 day streak
+          </div>
+
+          <div className="level-pill">
+            <Trophy size={14} />
+            LVL {level}
+          </div>
+
+          <button
+            className="avatar"
+            onClick={() => setAuthOpen(true)}
+            aria-label={
+              user ? 'Open account' : 'Sign in'
+            }
+            title={user ? 'Account' : 'Sign in'}
+          >
+            {user ? (
+              (
+                profile?.display_name?.[0] ||
+                user.email?.[0] ||
+                'Q'
+              ).toUpperCase()
+            ) : (
+              <User size={17} />
+            )}
+          </button>
+        </div>
+      </header>
+
+      <a
+        className="skip-link"
+        href="#learn"
+      >
+        Skip to content
+      </a>
+
+      <main id="main-content">
+
+        {/* =========================
+            HERO
+        ========================== */}
+
+        <VideoHero />
+
+        {/* =========================
+            LEARNING DASHBOARD
+        ========================== */}
+
+        <section
+          className="dashboard"
+          id="learn"
+        >
+          <div className="dashboard-head">
+            <div>
+              <div className="eyebrow">
+                YOUR LEARNING OS
+              </div>
+
+              <h2>
+                Your quantum learning path.
+              </h2>
+
+              <p>
+                Follow the concept, test the idea,
+                then demonstrate that you can use it.
+              </p>
+            </div>
+
+            <XPBar
+              xp={xp}
+              level={level}
+            />
+          </div>
+
+          <div className="stats">
+
+            <div>
+              <span>MASTERED</span>
+              <b>6</b>
+              <small>core concepts</small>
+            </div>
+
+            <div>
+              <span>NEXT MILESTONE</span>
+              <b>
+                {500 - (xp % 500)}
+              </b>
+              <small>XP remaining</small>
+            </div>
+
+            <div>
+              <span>BUILD</span>
+              <b>
+                {unlocked}/8
+              </b>
+              <small>components unlocked</small>
+            </div>
+
+            <div>
+              <span>DEBUG REVIEW</span>
+              <b>LIVE</b>
+              <small>learning loop</small>
+            </div>
+
+          </div>
+        </section>
+
+        {/* =========================
+            LEARNING PATH
+        ========================== */}
+
+        <section className="content-section">
+          <div className="section-title">
+            <span>01</span>
+
+            <div>
+              <div className="eyebrow">
+                LEARNING PATH
+              </div>
+
+              <h2>
+                Learn the system, then test it.
+              </h2>
+            </div>
+          </div>
+
+          <LearningAdvisor
+            level={level}
+            xp={xp}
+            unlocked={unlocked}
+          />
+
+          <CurriculumPath
+            xp={xp}
+            level={level}
+            onEarn={earn}
+          />
+        </section>
+
+        {/* =========================
+            QUANTUM MANGA
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="quantum"
+        >
+          <div className="manga-subsection">
+
+            <div className="section-title compact">
+              <span>01A</span>
+
+              <div>
+                <div className="eyebrow">
+                  QUANTUM MANGA
+                </div>
+
+                <h2>
+                  Read the concept as a story.
+                </h2>
+              </div>
+            </div>
+
+            <MangaViewer />
+
+          </div>
+        </section>
+
+        {/* =========================
+            QUBIT EXPERIMENT
+        ========================== */}
+
+        <section
+          className="content-section split"
+          id="qubit"
+        >
+          <Experiment earn={earn} />
+
+          <div className="concept-panel">
+            <div className="eyebrow">
+              CONCEPT SNAPSHOT
+            </div>
+
+            <h3>
+              Superposition, made visible.
+            </h3>
+
+            <p>
+              See how a qubit combines basis states,
+              how gates change its state, and how
+              measurement produces an outcome.
+            </p>
+
+            <div className="formula">
+              |ψ⟩ = α|0⟩ + β|1⟩
+            </div>
+
+            <button
+              className="secondary"
+              onClick={() => earn(40)}
+            >
+              <Lightbulb size={15} />
+              I get it
+            </button>
+          </div>
+        </section>
+
+        {/* =========================
+            3D QUBIT LAB
+        ========================== */}
+
+        <section className="content-section bloch-section">
+
+          <div className="section-title">
+            <span>01B</span>
+
+            <div>
+              <div className="eyebrow">
+                3D QUBIT LAB
+              </div>
+
+              <h2>
+                See a qubit state in 3D.
+              </h2>
+            </div>
+          </div>
+
+          <p className="section-lead">
+            Rotate the Bloch sphere, move the state
+            vector, and apply Hadamard to see a qubit
+            leave |0⟩ and enter superposition.
+          </p>
+
+          <Qubit3D
+            onComplete={() => earn(35)}
+          />
+
+        </section>
+
+        {/* =========================
+            QUANTUM STUDIO
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="studio"
+        >
+          <div className="section-title">
+            <span>02</span>
+
+            <div>
+              <div className="eyebrow">
+                QUANTUM STUDIO
+              </div>
+
+              <h2>
+                Construct the circuit. Run the idea.
+              </h2>
+            </div>
+          </div>
+
+          <p className="section-lead">
+            Design circuits visually, inspect the
+            state, generate executable code, compare
+            simulator results, and verify your
+            reasoning with a focused assessment.
+          </p>
+
+          <QuantumStudio
+            onComplete={() => earn(60)}
+          />
+        </section>
+
+        {/* =========================
+            ALGORITHM LAB
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="algorithms"
+        >
+          <div className="section-title">
+            <span>02A</span>
+
+            <div>
+              <div className="eyebrow">
+                ALGORITHM LAB
+              </div>
+
+              <h2>
+                Understand the method behind the circuit.
+              </h2>
+            </div>
+          </div>
+
+          <p className="section-lead">
+            Trace search, oracle methods,
+            teleportation, Fourier methods and
+            hybrid optimization from the underlying
+            idea to a runnable circuit.
+          </p>
+
+          <AlgorithmGallery />
+
+          <AlgorithmDemo
+            onComplete={() => earn(70)}
+          />
+        </section>
+
+        {/* =========================
+            ENTANGLEMENT LAB
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="entanglement"
+        >
+          <div className="section-title">
+            <span>02B</span>
+
+            <div>
+              <div className="eyebrow">
+                ENTANGLEMENT LAB
+              </div>
+
+              <h2>
+                Measure correlation, not just theory.
+              </h2>
+            </div>
+          </div>
+
+          <EntanglementDemo
+            onComplete={() => earn(70)}
+          />
+        </section>
+
+        {/* =========================
+            INSTRUCTOR DASHBOARD REMOVED
+        ========================== */}
+
+        {/* 
+          Instructor Dashboard removed.
+          The old section contained:
+
+          - Instructor Dashboard
+          - Learning progress
+          - Learning analytics
+          - Analytics backend
+          - /instructor/summary
+
+          The rest of the learning platform remains intact.
+        */}
+
+        {/* =========================
+            ASSESSMENT
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="assessment"
+        >
+          <div className="section-title">
+            <span>04</span>
+
+            <div>
+              <div className="eyebrow">
+                ASSESSMENT
+              </div>
+
+              <h2>
+                Build the circuit under constraint.
+              </h2>
+            </div>
+          </div>
+
+          <p className="section-lead">
+            A final challenge checks whether your
+            gate sequence produces the requested Bell
+            state and whether you understand why it works.
+          </p>
+
+          <FinalChallenge
+            onPassChallenge={() => earn(250)}
+          />
+        </section>
+
+        {/* =========================
+            BUG ARENA
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="debug"
+        >
+          <div className="section-title">
+            <span>02</span>
+
+            <div>
+              <div className="eyebrow">
+                BUG ARENA
+              </div>
+
+              <h2>
+                Debug the circuit. Explain the failure.
+              </h2>
+            </div>
+          </div>
+
+          <p className="section-lead">
+            Find a meaningful circuit error, verify
+            the correction, then create a harder one
+            for the next learner. Syntax-only mistakes
+            do not count.
+          </p>
+
+          <Debugger
+            earn={earn}
+            lesson={lesson}
+            level={level}
+            onBug={setBug}
+          />
+        </section>
+
+        {/* =========================
+            STORY MODE
+        ========================== */}
+
+        <section
+          className="content-section"
+          id="story"
+        >
+          <div className="section-title">
+            <span>03</span>
+
+            <div>
+              <div className="eyebrow">
+                STORY MODE
+              </div>
+
+              <h2>
+                Put a quantum idea in context.
+              </h2>
+            </div>
+          </div>
+
+          <p className="section-lead">
+            Choose a familiar world, character, sport,
+            game or story and use it to build a concrete
+            mental model for the concept.
+          </p>
+
+          <StoryMode
+            earn={earn}
+            level={level}
+          />
+        </section>
+
+        {/* =========================
+            MASTERY COLLECTION
+        ========================== */}
+
+        <section className="content-section">
+          <div className="puzzle-card">
+
+            <div>
+              <div className="eyebrow">
+                MASTERY COLLECTION
+              </div>
+
+              <h3>
+                Build your quantum car
+              </h3>
+
+              <p>
+                Complete meaningful learning actions
+                to unlock the next component.
+              </p>
+
+              <div className="piece-list">
+                {pieces.map((p, i) => (
+                  <div
+                    className={
+                      i < unlocked
+                        ? 'piece unlocked'
+                        : 'piece'
+                    }
+                    key={p}
+                  >
+                    {i < unlocked ? (
+                      <PuzzleIcon size={16} />
+                    ) : (
+                      <Lock size={14} />
+                    )}
+
+                    <span>{p}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className="rover quantum-car"
+              aria-label="Quantum car assembly visualization"
+            >
+              <div className="rover-shadow" />
+
+              <div className="rover-body">
+                <div className="car-hood" />
+
+                <div className="car-cabin">
+                  <div className="car-windshield" />
+                  <div className="car-window-side" />
+                </div>
+
+                <div className="car-door-line" />
+                <div className="car-handle" />
+                <div className="car-mirror" />
+                <div className="car-front-grille" />
+
+                <div className="rover-light car-headlight" />
+                <div className="car-taillight" />
+              </div>
+
+              <div className="rover-wheel w1">
+                <div className="wheel-rim" />
+                <div className="wheel-hub" />
+              </div>
+
+              <div className="rover-wheel w2">
+                <div className="wheel-rim" />
+                <div className="wheel-hub" />
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* =========================
+            GAME MODE
+        ========================== */}
+
+        <section
+          className="content-section game-mode-section"
+          id="game-mode"
+        >
+          <div className="game-mode-card">
+
+            <div className="game-mode-icon">
+              <Gamepad2 size={24} />
+            </div>
+
+            <div className="game-mode-copy">
+
+              <div className="eyebrow">
+                GAME MODE · FUTURE RELEASE
+              </div>
+
+              <h2>
+                Turn quantum learning into play.
+              </h2>
+
+              <p>
+                A dedicated game mode is planned for a
+                future release, with interactive challenges
+                that let you explore quantum ideas through
+                missions, puzzles and progression.
+              </p>
+
+              <div className="game-mode-status">
+                <span className="game-mode-dot" />
+
+                IN DEVELOPMENT
+
+                <span>·</span>
+
+                COMING IN A FUTURE RELEASE
+              </div>
+
+            </div>
+
+            <div className="game-mode-mark">
+              SOON
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+
+      {/* =========================
+          QUANTUM BOT
+      ========================== */}
+
+      <QBot
+        open={qopen}
+        setOpen={setQopen}
+        lesson={lesson}
+        level={level}
+        code={bug.code}
+        bug={JSON.stringify(bug)}
+      />
+
+      {/* =========================
+          FOOTER
+      ========================== */}
+
+      <footer aria-label="Site footer">
+        <div>
+          <b>QUILSBEE</b>
+          <span>
+            Learn the strange. Build the impossible.
+          </span>
+        </div>
+
+        <div>
+          © 2026 · Built for curious minds
+        </div>
+      </footer>
+
+      {/* =========================
+          AUTH MODAL
+      ========================== */}
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+      />
+
+    </div>
+  );
+}
 
 
 
